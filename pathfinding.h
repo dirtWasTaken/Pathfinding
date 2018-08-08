@@ -7,23 +7,27 @@ class pathfinding
 public:
 	pathfinding();
 	~pathfinding();
+	
+
 
 	struct Node
 	{
 		bool traversed = false;
-		Node* prev = nullptr;
-		float distance = 100000;
+		Node* parent;
+		std::list<Edge> connections;
 	};
 
-	std::list<Node*> foo;
+	void search(Node* startNode, Node* endNode);
 
-	void list(float distance);
+	Node* list(float distance);
 
 	void traverse();
 
 	void shutdown();
 
 private:
+
+
 
 #define mySAFE_DELETE(ptr_)     \
 {                               \
@@ -33,5 +37,5 @@ private:
         ptr_ = nullptr;         \
     }                           \
 }
-};
 
+};

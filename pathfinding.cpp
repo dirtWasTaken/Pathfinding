@@ -11,28 +11,37 @@ pathfinding::~pathfinding()
 {
 }
 
-void pathfinding::list(float distance)
+struct Edge
+{
+	pathfinding::Node* target;
+	float distance = 100000;
+};
+
+pathfinding::Node* pathfinding::list(float distance)
 {
 
-	Node* new_node = new Node;
-	if (foo.empty())
-	{
-		// First node in the list
-		new_node->prev = new_node;
-		new_node->traversed = true;
-		new_node->distance = 0;
-		foo.push_back(new_node);
-	}
-	else
-	{
-		// All subsequent nodes
-		new_node->distance = distance;
-		new_node->prev = foo.back();
-		new_node->prev->traversed = true;
-		foo.push_back(new_node);
+	//Node* new_node = new Node;
+	//if (new_node->connections.empty())
+	//{
+	//	// First node in the list
+	//	new_node->parent = new_node;
+	//	new_node->traversed = true;
+	//	new_node->connections.push_back(new_node);
+	//}
+	//else
+	//{
+	//	// All subsequent nodes
+	//	new_node->distance = distance;
+	//	new_node->prev = .back();
+	//	foo.push_back(new_node);
 
-	}
+	//}
 
+
+}
+
+void pathfinding::search(Node* startNode, Node* endNode)
+{
 }
 
 void pathfinding::traverse()
