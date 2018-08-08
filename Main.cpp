@@ -7,6 +7,7 @@
 struct Node;
 std::vector <Node*> graph;
 std::vector <Node*> queue;
+float totalTraversalCost;
 
 struct Edge
 {
@@ -62,47 +63,105 @@ struct Node
 //}
 
 
+//void findPath(Node* start, Node* end)
+//{
+//	queue.push_back(start);
+//	start->parent = start;
+//	start->gScore = 0;
+//
+//	while (!graph.empty())
+//	{
+//		for (size_t i = start->id; i <= end->id; i++)
+//		{
+//
+//
+//			if (!graph.empty())
+//			{
+//			graph.erase(graph.begin());
+//			queue.push_back(graph.front());
+//			}
+//
+//			queue[i]->traversed = true;
+//
+//				for (size_t c = 0; c < queue.back()->connections.size(); c++)
+//				{
+//					if (end->traversed == false)
+//					{
+//						queue[i]->connections[c].target->gScore += queue[i]->connections[c].cost;
+//
+//						if (queue[i]->gScore < end->gScore)
+//						{
+//							end->parent = queue[i];
+//							end->gScore += queue[i]->gScore;
+//							std::cout << queue[i]->gScore << "\n\n";
+//
+//							//if (i == 0)
+//							//{
+//							//	queue.push_back(end);    
+//							//}
+//							if (i == 4)
+//							{
+//								break;
+//								queue.clear();
+//							}
+//						}
+//						else
+//						{
+//							break;
+//						}
+//					}
+//				}
+//		}
+//	}
+//}
+
 void findPath(Node* start, Node* end)
 {
 	queue.push_back(start);
 	start->parent = start;
 	start->gScore = 0;
 
-	while (!queue.empty())
-	{
-		for (size_t i = start->id; i <= end->id; i++)
-		{
-
-				for (size_t c = 0; c < queue.back()->connections.size(); c++)
+	while (!graph.empty())
+	{ 
+			graph.erase(graph.begin());
+			queue.back()->traversed = true;
+			
+			for (size_t c = 0; c < queue.back()->connections.size(); c++)
+			{
+				if (end->traversed == false)
 				{
-					if (end->traversed == false)
-					{
-						queue.back()->gScore += queue.back()->connections[c].cost;
-						if (queue.back()->gScore < end->gScore)
-						{
-							end->parent = queue.back();
-							end->gScore += queue.back()->gScore;
-							std::cout << queue.back()->gScore << "\n\n";
+					queue.back()->connections[c].target->gScore = queue.back()->connections[c].cost;
 
-							if (i == 0)
-							{
-								queue.push_back(end);
-							}
-							if (i == 4)
-							{
-								break;
-								queue.clear();
-							}
-						}
-						else
-						{
-							break;
-						}
+					if (queue.back()->connections[c].target->gScore < end->gScore)
+					{
+						end->parent = queue.back();
+						end->gScore += queue.back()->connections[c].target->gScore;
+						std::cout << "current node gScore:  " << queue.back()->id <<"   "<<queue.back()->connections[c].target->gScore << "\n\n";
+						std::cout << "end gScore:  " << end->gScore - 1000 << "\n\n";
 					}
 				}
-		}
+			}
+
+			if (!graph.empty())
+			{
+				queue.push_back(graph.front());
+			}
 	}
+
 }
+						//if (i == 0)
+						//{
+						//	queue.push_back(end);    
+						//}
+						//if (i == 4)
+						//{
+						//	break;
+						//	queue.clear();
+						//}
+				/*		else
+						{
+							break;
+						}*/
 
 
 
