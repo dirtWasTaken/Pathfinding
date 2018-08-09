@@ -7,7 +7,6 @@
 struct Node;
 std::vector <Node*> graph;
 std::vector <Node*> queue;
-float totalTraversalCost;
 
 struct Edge
 {
@@ -26,7 +25,7 @@ struct Node
 	float y = 0;
 	bool traversed = false;
 	float gScore = 1000;
-	Node *parent = nullptr;
+	Node *prev = nullptr;
 	std::vector< Edge > connections;
 };
 
@@ -118,11 +117,11 @@ struct Node
 void findPath(Node* start, Node* end)
 {
 	queue.push_back(start);
-	start->parent = start;
+	start->prev = start;
 	start->gScore = 0;
 
-	while (!graph.empty())
-	{ 
+	while (!queue.empty())
+	{  
 			graph.erase(graph.begin());
 			queue.back()->traversed = true;
 			
@@ -134,10 +133,11 @@ void findPath(Node* start, Node* end)
 
 					if (queue.back()->connections[c].target->gScore < end->gScore)
 					{
-						end->parent = queue.back();
+						end->prev = queue.back()->connections[c].target;
 						end->gScore += queue.back()->connections[c].target->gScore;
-						std::cout << "current node gScore:  " << queue.back()->id <<"   "<<queue.back()->connections[c].target->gScore << "\n\n";
-						std::cout << "end gScore:  " << end->gScore - 1000 << "\n\n";
+
+						std::cout  << queue.back()->connections[c].target->id << " gScore "  << queue.back()->connections[c].target->gScore << "\n\n";
+						std::cout << "end gScore:  " << end->gScore << "\n\n";
 					}
 				}
 			}
@@ -147,23 +147,9 @@ void findPath(Node* start, Node* end)
 				queue.push_back(graph.front());
 			}
 	}
+	
 
 }
-						//if (i == 0)
-						//{
-						//	queue.push_back(end);    
-						//}
-						//if (i == 4)
-						//{
-						//	break;
-						//	queue.clear();
-						//}
-				/*		else
-						{
-							break;
-						}*/
-
-
 
 		/*
 		{
