@@ -1,12 +1,12 @@
 #include <list>
+#include <assert.h>
 #include <queue>
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 // Forward dec
 struct Node;
-std::vector <Node*> graph;
-std::vector <Node*> queue;
 
 struct Edge
 {
@@ -24,159 +24,86 @@ struct Node
 	float x = 0;
 	float y = 0;
 	bool traversed = false;
-	float gScore = 1000;
-	Node *prev = nullptr;
+	bool isStart = false;
+	float gScore = 0;
+	Node *parent = nullptr;
 	std::vector< Edge > connections;
+
+	bool operator == (Node* other)
+	{
+		return this->id == other->id;
+	}
 };
 
-
-//void findPath(int start, int end)
-//{
-//	graph[start]->parent = graph[start];
-//	graph[start]->gScore = 0;
-//	float currentGscore = 0;
-//
-//	while (!graph.empty())
-//	{
-//		for (size_t i = start; i < end; i++)
-//		{
-//			graph[i]->traversed = true;
-//
-//			for (size_t c = 0; c < graph[i]->connections.size(); c++)
-//			{
-//				if (graph[end]->traversed == false)
-//				{
-//					currentGscore = graph[i]->gScore + graph[i]->connections[c].cost;
-//
-//					if (currentGscore < graph[end]->gScore)
-//					{
-//						graph[end]->parent = graph[i];
-//						graph[end]->gScore = currentGscore;
-//						std::cout << currentGscore << "\n\n";
-//					}
-//				}
-//			}
-//
-//		}
-//	}
-//}
-
-
-//void findPath(Node* start, Node* end)
-//{
-//	queue.push_back(start);
-//	start->parent = start;
-//	start->gScore = 0;
-//
-//	while (!graph.empty())
-//	{
-//		for (size_t i = start->id; i <= end->id; i++)
-//		{
-//
-//
-//			if (!graph.empty())
-//			{
-//			graph.erase(graph.begin());
-//			queue.push_back(graph.front());
-//			}
-//
-//			queue[i]->traversed = true;
-//
-//				for (size_t c = 0; c < queue.back()->connections.size(); c++)
-//				{
-//					if (end->traversed == false)
-//					{
-//						queue[i]->connections[c].target->gScore += queue[i]->connections[c].cost;
-//
-//						if (queue[i]->gScore < end->gScore)
-//						{
-//							end->parent = queue[i];
-//							end->gScore += queue[i]->gScore;
-//							std::cout << queue[i]->gScore << "\n\n";
-//
-//							//if (i == 0)
-//							//{
-//							//	queue.push_back(end);    
-//							//}
-//							if (i == 4)
-//							{
-//								break;
-//								queue.clear();
-//							}
-//						}
-//						else
-//						{
-//							break;
-//						}
-//					}
-//				}
-//		}
-//	}
-//}
-
-void findPath(Node* start, Node* end)
+bool compareNodes(const Node* first, const Node* second)
 {
-	queue.push_back(start);
-	start->prev = start;
-	start->gScore = 0;
 
-	while (!queue.empty())
-	{  
-			graph.erase(graph.begin());
-			queue.back()->traversed = true;
-			
-			for (size_t c = 0; c < queue.back()->connections.size(); c++)
-			{
-				if (end->traversed == false)
-				{
-					queue.back()->connections[c].target->gScore = queue.back()->connections[c].cost;
-
-					if (queue.back()->connections[c].target->gScore < end->gScore)
-					{
-						end->prev = queue.back()->connections[c].target;
-						end->gScore += queue.back()->connections[c].target->gScore;
-
-						std::cout  << queue.back()->connections[c].target->id << " gScore "  << queue.back()->connections[c].target->gScore << "\n\n";
-						std::cout << "end gScore:  " << end->gScore << "\n\n";
-					}
-				}
-			}
-
-			if (!graph.empty())
-			{
-				queue.push_back(graph.front());
-			}
-	}
-	
-
+	return first->gScore < second->gScore;
 }
 
-		/*
+std::list<Node*> findPath(Node* start, Node* end)
+{
+	//declaratin of lists used throughout the pathfinding algorithm
+	std::list<Node*> openList;
+	std::list<Node*> closedList;
+	
+	//allows the identification of the start Node
+	start->isStart = true;
+	start->parent = nullptr;
+	//pushes the start node onto our list
+	openList.push_back(start);
+	
+	while (!openList.empty())
+	{
+		//sorts the distances (gScore) of all the nodes as the are allocated
+		openList.sort(compareNodes);
+
+		//sets the current Node pointer based upon the open list 
+		Node* currNode = openList.front();
+
+		//breaks the loop once the loop has reached the end node (this can be and mouse input click for something like an rts or moba game)
+		if (currNode == end)
 		{
-			if (i > 0)
-			{
-				queue.push_back(graph[i]);
-			}
-			queue[i]->traversed = true;
-
-			for (size_t c = 0; c < queue[i]->connections.size(); c++)
-			{
- 				if (end->traversed == false)
-				{
-					start->gScore = queue[i]->gScore + queue[i]->connections[c].cost;
-
-					if (queue[i]->connections[c].cost < end->gScore)
-					{
-						end->parent = queue[i];
-						end->gScore = start->gScore;
-						totalTraversal += end->gScore;
-						std::cout << totalTraversal << "\n\n";
-					}
-				}
-			}
-
+			break;
 		}
-	}*/
+		//removes the current node on the open list and places it onto the closed list, closed list is full of traversed nodes
+		openList.erase(openList.begin());
+		closedList.push_back(currNode);
+
+		//ranged for loop 
+		for (auto c : currNode->connections)
+		{
+			assert(c.target);
+			//std::find used to locate the targert node within the closed list of the current node 
+			if (std::find(closedList.begin(), closedList.end(), c.target) == closedList.end())
+			{
+				//then pushed the target node onto out open list 
+				openList.push_back(c.target);
+			}
+			//sets the target nodes gScore to the current gScore plus the edge cost
+			c.target->gScore = currNode->gScore + c.cost;
+			//sets the parent of target to the current node
+			c.target->parent = currNode;
+		}
+	}
+
+	//the declation of another list which will only contain the shortest path
+	std::list<Node*> path;
+
+	Node* currNode = end;
+
+	while (currNode->isStart == false)
+	{
+		//pushing back all the nodes that aren't the start node based on the bool we set at the start 
+		path.push_back(currNode);
+		//changes the current node to it's own parent pointed
+		currNode = currNode->parent;
+	}
+	//the pushes the last node which will always be the start node 
+	path.push_back(currNode);
+	//returns the path
+	return path;
+}
 
 void startApp()
 {
@@ -186,6 +113,7 @@ void startApp()
 
 int main()
 {
+	std::vector <Node*> graph;
 	// Create all nodes in  the graph
 	graph.push_back(new Node(0));
 	graph.push_back(new Node(1));
@@ -207,11 +135,9 @@ int main()
 	graph[3]->connections.push_back(Edge(graph[4], 4));
 
 	graph[5]->connections.push_back(Edge(graph[4], 6));
-	//using an int
-	//findPath(0, 5);
 
 	//using Node pointers
-	findPath(graph[0], graph[4]);
+	std::list<Node*> path = findPath(graph[0], graph[4]);
 
 	system("pause");
 }
